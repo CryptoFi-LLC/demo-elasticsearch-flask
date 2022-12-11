@@ -1,0 +1,87 @@
+<!doctype html>
+<html>
+    <head>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    </head>
+    <body>
+        <div class="container-fluid">
+            <h1>Transaction Filter Form</h1>
+            <form action="/" method="post">
+                <div class="row">
+
+                    <div class="col-sm">
+                        <div class="form-group">
+                            <label>User First Name:</label> 
+                            <input placeholder="eg: Kian" name="first_name" />
+                        </div>
+                        <div class="form-group">
+                            <label>User Last Name:</label> 
+                            <input placeholder="eg: Sarreshteh" name="last_name" />
+                        </div>
+                        <div class="form-group">
+                            <label>FI Name:</label> 
+                            <input placeholder="eg: Kian" name="fi_name" />
+                        </div>
+                    </div class="col-sm">
+
+                    <div class="col-sm">
+                        <div class="form-group">
+                            <label>Transaction ID:</label> 
+                            <input placeholder="eg: QL-55" name="transaction_id" />
+                        </div>
+                        <div class="form-group" style="width:300px">
+                            <label>Transaction Type:</label> 
+                             <select class="form-control" >
+                                <option>buy</option>
+                                <option>sell</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Amount:</label> 
+                            <input placeholder="eg: 400" name="amount_fiat" />
+                        </div>
+                    </div class="col-sm">
+
+                </div class="row">
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+            <hr />
+
+            <h1>Results</h1>
+            <p>
+                <b>Time Spent Fetching Results:</b> {{ time_spent_fetching_results.seconds }} seconds and {{ time_spent_fetching_results.microseconds }} microseconds <br /> <b>Total Results:</b> {{ elasticsearch_response.hits.total.value }}
+            </p>
+            <table class="table table-bordered">
+                <thead class="thead-light">
+                    <tr>
+                        <th>Date</th>
+                        <th>User</th>
+                        <th>FI</th>
+                        <th>FI State</th>
+                        <th>Price BTC</th>
+                        <th>Type</th>
+                        <th>USD Val</th>
+                        <th>BTC Val</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for result in elasticsearch_response.hits.hits %}
+                    <tr>
+                        <td>{{ result._source.date_created.split('T')[0] }} | {{ result._source.date_created.split('T')[1].split('.')[0] }}</td>
+                        <td>{{ result._source.account_first_name }} {{ result._source.account_last_name }}</td>
+                        <td>{{ result._source.fi_name }}</td>
+                        <td>{{ result._source.fi_state }}</td>
+                        <td>${{ "{:,}".format(result._source.price_btc) }}</td>
+                        <td>{{ result._source.transaction_type }}</td>
+                        <td>${{ "{:,}".format(result._source.amount_fiat) }}</td>
+                        <td>{{ result._source.amount_crypto|round(8) }}</td>
+                        <td>{{ result._source.status }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+
+        </div class="container">
+    </body>
+<html>
