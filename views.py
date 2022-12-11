@@ -32,15 +32,13 @@ def transactions():
     if request.method == 'POST':
         print('posting')
         
-
     # Query local ElasticSearch for transactions
     elasticsearch_response = requests.api.get('http://localhost:9200/transactions/_search/',
         data=json.dumps(es_query),
         headers={'Content-type': 'application/json'},
     )
 
-
-    # Measure response time
+    # Render the template
     return render_template('transactions.html', 
         time_spent_fetching_results = datetime.datetime.now() - start,
         elasticsearch_response=json.loads(elasticsearch_response.content)
