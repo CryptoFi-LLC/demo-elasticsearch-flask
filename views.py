@@ -4,8 +4,11 @@ import json
 from flask import Flask, request, render_template
 import requests
 
+from forms import TransactionForm
+
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = 'please dont hack me'
 
 @app.route('/', methods=['GET', 'POST'])
 def transactions():
@@ -28,9 +31,29 @@ def transactions():
         },"_score"]
     }
 
+    # Instatiate form (auto-magically binds to request.POST)
+    transaction_form = TransactionForm()
+
     # Handle form submissions that filter the transactions
-    if request.method == 'POST':
-        print('posting')
+    if request.method == 'POST' and transaction_form.has_valid_data():
+        print('processing form data')
+        # Use form details to dynamically construct ES query
+        es_query.update({
+            "query": {
+                "bool": {
+                    "filter": []
+                }
+            }
+        })
+
+        # Iterate over all validly submitted form fields to structure 
+        # our ElasticSearch query
+        for field_name in transaction_form.get_validly_bound_field_names():
+            es_query['query']['bool']['filter'].append({
+                "match_phrase": {
+                    field_name: transaction_form.data[field_name]
+                }
+            })
         
     # Query local ElasticSearch for transactions
     elasticsearch_response = requests.api.get('http://localhost:9200/transactions/_search/',
@@ -41,5 +64,6 @@ def transactions():
     # Render the template
     return render_template('transactions.html', 
         time_spent_fetching_results = datetime.datetime.now() - start,
-        elasticsearch_response=json.loads(elasticsearch_response.content)
+        transaction_form=transaction_form,
+        elasticsearch_response=json.loads(elasticsearch_response.content),
     )

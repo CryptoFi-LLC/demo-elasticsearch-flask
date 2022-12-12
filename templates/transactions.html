@@ -12,33 +12,26 @@
                     <div class="col-sm">
                         <div class="form-group">
                             <label>User First Name:</label> 
-                            <input placeholder="eg: Kian" name="first_name" />
+                            {{ transaction_form.account_first_name }}
                         </div>
                         <div class="form-group">
                             <label>User Last Name:</label> 
-                            <input placeholder="eg: Sarreshteh" name="last_name" />
+                            {{ transaction_form.account_last_name }}
                         </div>
                         <div class="form-group">
                             <label>FI Name:</label> 
-                            <input placeholder="eg: Kian" name="fi_name" />
+                            {{ transaction_form.fi_name }}
                         </div>
                     </div class="col-sm">
 
                     <div class="col-sm">
                         <div class="form-group">
                             <label>Transaction ID:</label> 
-                            <input placeholder="eg: QL-55" name="transaction_id" />
-                        </div>
-                        <div class="form-group" style="width:300px">
-                            <label>Transaction Type:</label> 
-                             <select class="form-control" >
-                                <option>buy</option>
-                                <option>sell</option>
-                            </select>
+                            {{ transaction_form.qldb_id }}
                         </div>
                         <div class="form-group">
-                            <label>Amount:</label> 
-                            <input placeholder="eg: 400" name="amount_fiat" />
+                            <label>Transaction Type:</label> 
+                            {{ transaction_form.transaction_type }}
                         </div>
                     </div class="col-sm">
 
